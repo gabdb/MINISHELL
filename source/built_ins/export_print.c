@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   export_print.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
+/*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 13:28:03 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/10/24 15:53:53 by gnyssens         ###   ########.fr       */
+/*   Updated: 2024/12/18 14:52:41 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,23 +35,12 @@ void	sort_array(char **array)
 void	fill_env_array(char **array, t_env *env)
 {
 	int		i;
-	char	*temp;
-	char double_quote[2];
 
-	double_quote[0] = 34; //34 == "
-	double_quote[1] = '\0';
 	i = 0;
 	while (env)
 	{
 		if (env->content)
-		{
-			temp = safe_strjoin(env->value, "=");
-			temp = safe_strjoin(temp, double_quote);
-			temp = safe_strjoin(temp, env->content);
-			temp = safe_strjoin(temp, double_quote);
-			array[i] = safe_strdup(temp);
-			free(temp);
-		}
+			filler(array, env, &i);
 		else
 			array[i] = safe_strdup(env->value);
 		i++;
@@ -60,7 +49,7 @@ void	fill_env_array(char **array, t_env *env)
 	array[i] = NULL;
 }
 
-char    **env_to_array(t_env *env)
+char	**env_to_array(t_env *env, int mustsort)
 {
 	int		size;
 	t_env	*current;
@@ -75,24 +64,41 @@ char    **env_to_array(t_env *env)
 	}
 	env_array = (char **)safe_malloc(sizeof(char *) * (size + 1));
 	fill_env_array(env_array, env);
-	sort_array(env_array);
+	if (mustsort)
+		sort_array(env_array);
 	return (env_array);
 }
 
-//il manque les "", comme dans declare -x VAR="content", faudrait rajouter idealement
+void	print_helper(char **array, char *temp, int i)
+{
+	temp = strdup_until_c(array[i], '=');
+	write(1, temp, ft_strlen(temp));
+	free(temp);
+	write(1, "=\"", 2);
+	temp = safe_strdup(array[i] + length_untill_c(array[i], '=') + 1);
+	write(1, temp, ft_strlen(temp));
+	free(temp);
+	write(1, "\"", 1);
+}
+
 void	print_export(t_env *env)
 {
 	char	**array;
 	int		i;
+	char	*temp;
 
-	array = env_to_array(env);
-	i = 0;
-	while (array[i])
+	array = env_to_array(env, 1);
+	i = -1;
+	temp = NULL;
+	while (array[++i])
 	{
 		write(1, "declare -x ", 11);
-		write(1, array[i], ft_strlen(array[i]));
+		if (is_there_equal(array[i]) == 0)
+			write(1, array[i], ft_strlen(array[i]));
+		else
+			print_helper(array, temp, i);
 		write(1, "\n", 1);
-		i++;
 	}
+	g_exit_status = 0;
 	free_split(array);
 }

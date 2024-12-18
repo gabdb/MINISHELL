@@ -1,26 +1,43 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   exec_input.c                                       :+:      :+:    :+:   */
+/*   cmd_parser.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/05 17:05:37 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/18 14:49:33 by eschmitz         ###   ########.fr       */
+/*   Created: 2024/11/28 13:48:04 by eschmitz          #+#    #+#             */
+/*   Updated: 2024/12/11 16:12:02 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-void	handle_input(t_redir *node, t_env **env, t_shell *sh)
+char	**get_arg(t_token *token)
 {
-	int	fd;
+	char	**arg;
+	int		i;
 
-	fd = open(node->file, O_RDONLY);
-	if (fd < 0 || !node->cmd)
-		return ;
-	dup2(fd, STDIN_FILENO);
-	close(fd);
-	if (node->cmd)
-		execute_ast(node->cmd, env, sh);
+	arg = malloc(sizeof(char *) * (ft_lstsize(token) + 1));
+	i = 0;
+	while (token)
+	{
+		arg[i] = ft_strdup(token->content);
+		token = token->next;
+		i++;
+	}
+	arg[i] = NULL;
+	return (arg);
+}
+
+t_ast	*cmd_node(char **arg, t_env *env)
+{
+	t_cmd	*cmd;
+
+	cmd = malloc(sizeof(t_cmd));
+	if (!cmd)
+		return (NULL);
+	cmd->type = CMD;
+	cmd->arg = arg;
+	cmd->env = env;
+	return ((t_ast *)cmd);
 }

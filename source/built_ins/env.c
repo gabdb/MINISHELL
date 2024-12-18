@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
+/*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/08 17:09:31 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/11/07 16:45:39 by gnyssens         ###   ########.fr       */
+/*   Updated: 2024/12/18 14:49:19 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,12 +14,12 @@
 
 int	length_untill_c(char *str, char c)
 {
-	int len;
+	int	len;
 
 	len = 0;
 	while (str[len] && str[len] != c)
 		len++;
-	if (str[len] != c) // == probleme !
+	if (str[len] != c)
 		return (0);
 	return (len);
 }
@@ -30,37 +30,36 @@ char	*strdup_until_c(char *str, char c)
 	char	*result;
 
 	len = length_untill_c(str, c);
-	if (str[len] == c) //sinon ya un probleme en vrai, pas de '=' dans un env...
+	if (str[len] == c)
 		str[len] = '\0';
 	result = safe_strdup(str);
 	str[len] = c;
 	return (result);
 }
 
-t_env	*init_env_list(char **env)
+t_env	*init_env_list(char **env, int i)
 {
-	int		i;
 	t_env	*head;
 	t_env	*current;
 
 	if (!env)
 		return (NULL);
 	head = (t_env *)safe_malloc(sizeof(t_env));
-	i = 0;
 	head->value = strdup_until_c(env[i], '=');
-	head->content = safe_strdup(env[i] + length_untill_c(env[i], '=') + 1); //pr copier tout ce qu'il y a après '='
+	head->content = safe_strdup(env[i] + length_untill_c(env[i], '=') + 1);
 	current = head;
 	while (env[++i])
 	{
 		if (env[i + 1])
 			current->next = (t_env *)safe_malloc(sizeof(t_env));
 		else
-			current->next = NULL; //quand cest le dernier node, je mets next a NULL sans mallocquer
+			current->next = NULL;
 		current = current->next;
 		if (current)
 		{
 			current->value = strdup_until_c(env[i], '=');
-			current->content = safe_strdup(env[i] + length_untill_c(env[i], '=') + 1);
+			current->content = safe_strdup(env[i]
+					+ length_untill_c(env[i], '=') + 1);
 		}
 	}
 	return (head);
@@ -104,4 +103,5 @@ void	free_env_list(t_env *head)
 		free(current);
 		current = head;
 	}
+	head = NULL;
 }

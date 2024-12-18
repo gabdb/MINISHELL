@@ -3,99 +3,106 @@
 /*                                                        :::      ::::::::   */
 /*   exec_cmd.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
+/*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/30 14:45:40 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/11/20 22:40:38 by gnyssens         ###   ########.fr       */
+/*   Updated: 2024/12/18 14:49:08 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/minishell.h"
+#include "minishell.h"
 
-void    print_full_command(t_ast *node)
+void	decrement_shell_level(t_env *env)
 {
-    int     i;
-	int		j;
-    char	**arg;	
+	int		temp;
+	t_env	*node;
+	char	*new_str;
 
-	arg = node->value;
-    i = 0;
-    while (arg[i])
+	node = get_node(env, "SHLVL");
+	if (!node)
+		return ;
+	temp = my_atoi(node->content) - 1;
+	new_str = malloc(sizeof(char) * 16);
+	if (!new_str)
+		return ;
+	if (temp < 1 || temp > 1000)
+		temp = 1;
+	new_str = ft_itoa(temp);
+	node->content = new_str;
+}
+
+void	increment_shell_level(t_env *env)
+{
+	int		temp;
+	t_env	*node;
+	char	*new_str;
+
+	node = get_node(env, "SHLVL");
+	if (!node)
+		return ;
+	temp = my_atoi(node->content) + 1;
+	new_str = malloc(sizeof(char) * 16);
+	if (!new_str)
+		return ;
+	if (temp < 1 || temp > 1000)
+		temp = 1;
+	new_str = ft_itoa(temp);
+	node->content = new_str;
+}
+
+void	add_path(t_cmd *node, t_env *env)
+{
+	int		i;
+	char	**split_path;
+	char	*check;
+	char	*temp;
+
+	while (env && ft_strcmp(env->value, "PATH"))
+		env = env->next;
+	if (!env || ft_strcmp(env->value, "PATH"))
+		return ;
+	split_path = ft_split(env->content, ':');
+	i = -1;
+	while (split_path[++i])
 	{
-		j = 0;
-		write(1, "\"", 1);
-		while (arg[i][j])
+		check = safe_strjoin(split_path[i], "/");
+		temp = check;
+		check = safe_strjoin(check, node->arg[0]);
+		free(temp);
+		if (access(check, X_OK) == 0)
 		{
-			write(1, arg[i] + j, 1);
-			j++;
+			free(node->arg[0]);
+			node->arg[0] = safe_strdup(check);
+			return (free(check), free_split(split_path));
 		}
-		write(1, "\", ", 3);
-		i++;
+		free(check);
 	}
-	write(1, "\n", 1);
 }
 
-void    add_path(t_ast *cmd, t_env *env)
+int	execute_command(t_cmd *node, t_env *env)
 {
-    int     i;
-    char    **split_path;
-    char    *check;
-    char    *temp; //sert juste a pas avoir de memory leaks avec 'check'
+	char	**env_array;
 
-    while (ft_strcmp(env->value, "PATH") != 0)
-        env = env->next;
-    split_path = ft_split(env->content, ':');
-    i = 0;
-    while (split_path[i])
-    {
-        check = safe_strjoin(split_path[i], "/");
-        temp = check;
-        check = safe_strjoin(check, cmd->value[0]);
-        free(temp);
-        if (access(check, X_OK) == 0)
-        {
-            free(cmd->value[0]);
-            cmd->value[0] = safe_strdup(check);
-            return (free(check), free_split(split_path));
-        }
-        free(check);
-        i++;
-    }
-}
-
-//je suppose return int pour errno valeur retour jsp quoi
-int execute_command(t_ast *cmd, t_env *env, t_shell *sh)
-{
-    char    **env_array;
-
-    add_path(cmd, env);
-    (void)sh;
-	// print debugging
-	//write(2, "node->value, so full command to be execve: ", 43);
-	//print_full_command(cmd);
-	//print_value(cmd->value);
-    env_array = env_to_array(env);
-    fill_env_array(env_array, env);
-	//write(2, "\n2e CHECK de l'exec\n", 20);
-	if (-1 == execve(cmd->value[0], cmd->value, env_array))
+	add_path(node, env);
+	if (!ft_strcmp(node->arg[0], "./minishell"))
+		increment_shell_level(env);
+	env_array = env_to_array(env, 0);
+	if (!get_node(env, "PATH"))
 	{
 		free_split(env_array);
-		perror("execve failed !\n"); //surement pas que ca à faire
-		exit(EXIT_FAILURE);
-	} //return status/value ???
-	exit(EXIT_SUCCESS); //p e du yaourt cette ligne
-    return (EXIT_FAILURE);
-}
-
-void    handle_cmd(t_ast *node, t_env **env, t_shell *sh)
-{
-    pid_t   pid;
-
-    pid = fork();
-    if (pid < 0)
-        exit(EXIT_FAILURE); // == problem with fork() !
-    else if (0 == pid)
-        execute_command(node, *env, sh);
-    else
-        waitpid(pid, &sh->return_value, 0); //wait for child to finish
+		write(2, "minishell: ", 1);
+		write(2, node->arg[0], ft_strlen(node->arg[0]));
+		write(2, ": No such file or directory\n", 28);
+		exit(127);
+	}
+	g_exit_status = 0;
+	if (-1 == execve(node->arg[0], node->arg, env_array))
+	{
+		free_split(env_array);
+		write(2, "minishell: ", 11);
+		write(2, node->arg[0], ft_strlen(node->arg[0]));
+		write(2, ": command not found\n", 20);
+		exit(127);
+	}
+	exit (g_exit_status);
 }

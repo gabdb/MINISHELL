@@ -6,7 +6,7 @@
 /*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 17:57:51 by eschmitz          #+#    #+#             */
-/*   Updated: 2024/11/12 15:54:10 by eschmitz         ###   ########.fr       */
+/*   Updated: 2024/12/13 15:47:38 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,13 +23,15 @@ int	is_meta(char c, int *sqs, int *dqs)
 	return (0);
 }
 
-void	check_qs(int sqs, int dqs, t_token *tokens)
+int	check_qs(int sqs, int dqs, t_token **tokens)
 {
 	if (sqs || dqs)
 	{
 		ft_lstclear(tokens, &free);
-		ft_error("syntax error: quote not closed", 0, 0);
+		ft_error("syntax error: quote not closed\n", 0, 0);
+		return (1);
 	}
+	return (0);
 }
 
 void	new_qs(char c, int *sqs, int *dqs)

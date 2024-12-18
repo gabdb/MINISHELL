@@ -3,58 +3,70 @@
 /*                                                        :::      ::::::::   */
 /*   exec_pipe.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
+/*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 16:41:10 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/11/21 17:22:20 by gnyssens         ###   ########.fr       */
+/*   Updated: 2024/12/18 14:10:12 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../../includes/minishell.h"
+#include "minishell.h"
 
-void	decoupage_left_pipe(int *pipe_fd, t_ast *node, t_env **env, t_shell *sh)
+void	set_exit_status(int status)
 {
-	close(pipe_fd[0]);
-	dup2(pipe_fd[1], STDOUT_FILENO);
-	close(pipe_fd[1]);
-	execute_ast(node->left, env, sh);
-	exit(EXIT_FAILURE);
+	if (WIFEXITED(status))
+		g_exit_status = WEXITSTATUS(status);
+	else if (WIFSIGNALED(status))
+		g_exit_status = 128 + WTERMSIG(status);
 }
 
-void	decoupage_right_pipe(int *pipe_fd, t_ast *node, t_env **env, t_shell *sh)
+void	handle_dup2(int old_fd, int new_fd)
+{
+	if (dup2(old_fd, new_fd) == -1)
+		exit(EXIT_FAILURE);
+}
+
+void	right_pid(t_pipe *node, t_env **env, t_shell *sh, int *pipe_fd)
 {
 	close(pipe_fd[1]);
-	dup2(pipe_fd[0], STDIN_FILENO);
+	handle_dup2(pipe_fd[0], STDIN_FILENO);
 	close(pipe_fd[0]);
 	execute_ast(node->right, env, sh);
 	exit(EXIT_FAILURE);
 }
 
-void    handle_pipe(t_ast *node, t_env **env, t_shell *sh)
+void	left_pid(t_pipe *node, t_env **env, t_shell *sh, int *pipe_fd)
 {
-	pid_t	pid;
+	close(pipe_fd[0]);
+	handle_dup2(pipe_fd[1], STDOUT_FILENO);
+	close(pipe_fd[1]);
+	execute_ast(node->left, env, sh);
+	exit(EXIT_FAILURE);
+}
+
+void	handle_pipe(t_pipe *node, t_env **env, t_shell *sh)
+{
 	int		pipe_fd[2];
-	
-    if (-1 == pipe(pipe_fd))
-		exit(EXIT_FAILURE); //p-e juste return (EXIT_FAILURE), et perror
-    pid = fork();
-    if (pid < 0)
-		exit(EXIT_FAILURE); // == problem with fork() !
-	if (0 == pid) //handle left child
-		decoupage_left_pipe(pipe_fd, node, env, sh);
-	else
-		waitpid(pid, &sh->return_value, 0);
-	pid = fork();
-	if (pid < 0)
-		exit(EXIT_FAILURE); // == problem with fork() !
-	//write(1, "AAAAAAAAAAAAAAA\n", 16);
-	if (0 == pid) //handle right child
-		decoupage_right_pipe(pipe_fd, node, env, sh);
-	else
-	{
-		close(pipe_fd[0]);
-		close(pipe_fd[1]);
-	}
-	if (pid > 0)
-		waitpid(pid, &sh->return_value, 0);
+	pid_t	pid_left;
+	pid_t	pid_right;
+	int		status;
+
+	if (pipe(pipe_fd) == -1)
+		exit(EXIT_FAILURE);
+	pid_left = fork();
+	if (pid_left < 0)
+		exit(EXIT_FAILURE);
+	if (pid_left == 0)
+		left_pid(node, env, sh, pipe_fd);
+	pid_right = fork();
+	if (pid_right < 0)
+		exit(EXIT_FAILURE);
+	if (pid_right == 0)
+		right_pid(node, env, sh, pipe_fd);
+	close(pipe_fd[0]);
+	close(pipe_fd[1]);
+	waitpid(pid_left, &status, 0);
+	set_exit_status(status);
+	waitpid(pid_right, &status, 0);
+	set_exit_status(status);
 }

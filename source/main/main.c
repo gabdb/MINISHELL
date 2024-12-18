@@ -6,59 +6,59 @@
 /*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 13:54:50 by eschmitz          #+#    #+#             */
-/*   Updated: 2024/11/21 15:25:50 by eschmitz         ###   ########.fr       */
+/*   Updated: 2024/12/18 14:48:31 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
 
-//Exécute les étapes de fonctionnement de minishell en vérifiant le bon fonctionnement général après chaque étape
 void	minilaunch(t_shell *sh)
 {
-	int	verif;
+	int		verif;
+	int		heredocs;
+	t_ast	*ast;
 
 	verif = 0;
-	verif = lex(sh);
+	verif = lex(sh->command, &sh->token);
+	if (verif == 0)
+		verif = expander(sh, &sh->expander);
 	if (verif == 0)
 	{
-		verif = parsing(sh);
+		heredocs = countheredocs(sh->expander);
+		ast = parser(&sh->expander, sh->env, &heredocs, sh);
 		if (verif == 0)
 		{
-			execute_ast(sh->ast, &sh->env, sh);
-			free_ast(sh->ast);
+			pre_ast(ast, &sh->env, sh);
+			free_ast(ast);
 		}
 	}
 }
 
-//Loop dans le programme
 int	main(int argc, char **argv, char **envp)
 {
 	t_shell	*sh;
 
-	if (argc != 1)
+	if (argc != 1 || argv[1])
 		return (ft_error("No argument is allowed\n", 0, 0));
-	(void)argv;
-	sh = malloc(sizeof(t_shell));
-	if (!sh)
-		return (EXIT_FAILURE);
+	sh = safe_malloc(sizeof(t_shell));
 	sh->env = NULL;
-	// checker();
-	sh->env = init_env_list(envp);
+	sh->env = init_env_list(envp, 0);
 	if (shell_init(sh) == 0)
 	{
-		sh->loop = 0;
 		while (sh->loop == 0)
 		{
-			sh->command = readline("minishell efficace> ");
+			handle_signal(0);
+			sh->command = readline("minishell> ");
 			if (!sh->command)
-				return (ft_error("Error with shell launch", 0, 0));
+				return (ft_error("exit\n", 0, 0));
+			if (sh->command[0] == '\0')
+				continue ;
 			else
 				add_history(sh->command);
 			minilaunch(sh);
 			ft_free(sh);
 		}
 	}
-	// free_env(&sh);
-	// sh.env = NULL;
+	free_env_list(sh->env);
 	return (0);
 }
