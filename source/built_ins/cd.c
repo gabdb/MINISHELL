@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
+/*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 14:28:41 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/18 16:05:37 by gnyssens         ###   ########.fr       */
+/*   Updated: 2024/12/18 16:49:10 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,23 +50,26 @@ void	ft_cd(t_cmd *node, t_env *env, char *path)
 	g_exit_status = 0;
 	if (!(node->arg[1]))
 	{
-		path = find_home(env);
+		path = ft_strdup(find_home(env));
 		if (!path)
 			return (my_write(2, "minishell: cd: HOME not set\n", 1));
 	}
 	else
-		path = node->arg[1];
+		path = ft_strdup(node->arg[1]);
 	if (path && ft_strcmp(path, "-") == 0)
 	{
-		path = find_old_pwd(env);
-		write_plus_newline(1, path);
+		path = ft_strdup(find_old_pwd(env));
+		if (path)
+			write_plus_newline(1, path);
 	}
 	update_old_pwd(env);
-	if (chdir(path) != 0)
+	if (path && chdir(path) != 0)
 	{
+		update_old_pwd(env);
 		my_write(2, "minishell: cd: ", 1);
 		my_write(2, node->arg[1], 1);
 		my_write(2, ": No such file or directory\n", 1);
 	}
 	update_pwd(env);
+	free(path);
 }

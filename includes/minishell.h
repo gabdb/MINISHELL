@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
+/*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/09/26 14:00:29 by eschmitz          #+#    #+#             */
-/*   Updated: 2024/12/18 14:55:36 by eschmitz         ###   ########.fr       */
+/*   Updated: 2024/12/18 17:15:22 by gnyssens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -290,6 +290,7 @@ int			exp_strcmp(char *s1, char *s2);
 int			plus_exp_strcmp(char *s1, char *s2);
 
 //UTILS
+t_env		*special_create_env(void);
 char		*safe_strdup(char *str);
 void		*safe_malloc(unsigned int size);
 void		free_split(char **mem);

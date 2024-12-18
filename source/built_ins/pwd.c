@@ -6,7 +6,7 @@
 /*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/08 15:58:47 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/18 13:01:30 by eschmitz         ###   ########.fr       */
+/*   Updated: 2024/12/18 16:49:00 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,7 +16,10 @@ char	*find_old_pwd(t_env *env)
 {
 	while (env->next && ft_strcmp(env->value, "OLDPWD") != 0)
 		env = env->next;
-	return (env->content);
+	if (env && !ft_strcmp(env->value, "OLDPWD"))
+		return (env->content);
+	my_write(2, "minishell: cd: OLDPWD not set\n", 2);
+	return (NULL);
 }
 
 void	ft_pwd(t_shell *sh)

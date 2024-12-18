@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
+/*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/08 17:09:31 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/18 14:49:19 by eschmitz         ###   ########.fr       */
+/*   Updated: 2024/12/18 17:23:02 by gnyssens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,8 +42,11 @@ t_env	*init_env_list(char **env, int i)
 	t_env	*head;
 	t_env	*current;
 
-	if (!env)
-		return (NULL);
+	if (*env == NULL)
+	{
+		write(2, "ya pas de env, fonction hardcode\n", 33);
+		return (special_create_env());
+	}
 	head = (t_env *)safe_malloc(sizeof(t_env));
 	head->value = strdup_until_c(env[i], '=');
 	head->content = safe_strdup(env[i] + length_untill_c(env[i], '=') + 1);
