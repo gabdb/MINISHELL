@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
+/*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 14:51:49 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/17 17:30:42 by eschmitz         ###   ########.fr       */
+/*   Updated: 2024/12/18 15:34:30 by gnyssens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -96,6 +96,7 @@ void	ft_exit(t_cmd *node, t_shell *sh)
 	else if (node->arg[2] != NULL)
 	{
 		write(2, "minishell: exit: too many arguments\n", 36);
+		g_exit_status = 1;
 		return ;
 	}
 	x = my_atoi(node->arg[1]);
