@@ -6,7 +6,7 @@
 /*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/12/11 14:51:49 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/18 15:34:30 by gnyssens         ###   ########.fr       */
+/*   Updated: 2024/12/18 15:40:55 by gnyssens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,18 +61,19 @@ int	non_numeric(char *str)
 	int	i;
 
 	i = 0;
-	if (str[i] == '-' || str[i] == '+')
+	while (str[i] == 32 || (str[i] >= 9 && str[i] <= 13))
+		i++;
+	if (str[i] == '-' || str[i] == '+' || str[i] == 32)
 		i++;
 	while (str[i])
 	{
-		if (str[i] < '0' || str[i] > '9')
+		if (str[i] < '0' || str[i++] > '9')
 		{
 			write(2, "minishell: exit: ", 18);
 			write(2, str, ft_strlen(str));
 			write(2, ": numeric argument required\n", 28);
 			return (1);
 		}
-		i++;
 	}
 	if (my_atoi(str) > 2147483647999999999)
 	{

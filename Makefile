@@ -6,7 +6,7 @@
 #    By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/04 14:59:57 by eschmitz          #+#    #+#              #
-#    Updated: 2024/12/18 15:07:59 by gnyssens         ###   ########.fr        #
+#    Updated: 2024/12/18 15:57:18 by gnyssens         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,7 +15,7 @@
 
 NAME	= minishell
 CC		= cc
-CFLAGS	= -Wall -Werror -Wextra #-g3 -fsanitize=address
+CFLAGS	= -Wall -Werror -Wextra -g3 -fsanitize=address
 RM		= rm -rf
 
 # Libraries

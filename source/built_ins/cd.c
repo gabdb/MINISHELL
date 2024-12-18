@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   cd.c                                               :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
+/*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 14:28:41 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/18 12:59:46 by eschmitz         ###   ########.fr       */
+/*   Updated: 2024/12/18 16:05:37 by gnyssens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,20 +14,22 @@
 
 void	update_old_pwd(t_env *env)
 {
-	while (env->next && ft_strcmp(env->value, "OLDPWD") != 0)
+	while (env && env->next && ft_strcmp(env->value, "OLDPWD") != 0)
 		env = env->next;
-	if (env->content)
+	if (env && env->content)
 		free(env->content);
-	env->content = getcwd(NULL, 0);
+	if (env)
+		env->content = getcwd(NULL, 0);
 }
 
 void	update_pwd(t_env *env)
 {
-	while (env->next && ft_strcmp(env->value, "PWD") != 0)
+	while (env && env->next && ft_strcmp(env->value, "PWD") != 0)
 		env = env->next;
-	if (env->content)
+	if (env && env->content)
 		free(env->content);
-	env->content = getcwd(NULL, 0);
+	if (env)
+		env->content = getcwd(NULL, 0);
 }
 
 void	my_write(int fd, char *str, int flag)
@@ -46,13 +48,6 @@ void	write_plus_newline(int fd, char *str)
 void	ft_cd(t_cmd *node, t_env *env, char *path)
 {
 	g_exit_status = 0;
-	if (!node->arg[1])
-		node->arg[2] = NULL;
-	if (node->arg[2])
-	{
-		g_exit_status = 1;
-		return (my_write(2, "minishell: cd: too many arguments !\n", 2));
-	}
 	if (!(node->arg[1]))
 	{
 		path = find_home(env);
@@ -68,6 +63,10 @@ void	ft_cd(t_cmd *node, t_env *env, char *path)
 	}
 	update_old_pwd(env);
 	if (chdir(path) != 0)
-		my_write(2, "minishell: cd: No such file or directory\n", 1);
+	{
+		my_write(2, "minishell: cd: ", 1);
+		my_write(2, node->arg[1], 1);
+		my_write(2, ": No such file or directory\n", 1);
+	}
 	update_pwd(env);
 }

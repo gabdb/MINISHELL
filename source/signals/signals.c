@@ -6,7 +6,7 @@
 /*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/12 11:48:03 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/17 17:42:25 by gnyssens         ###   ########.fr       */
+/*   Updated: 2024/12/18 15:48:46 by gnyssens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void	testingg(int signum)
 
 void	handle_signal(int process)
 {
+	g_exit_status = 0;
 	if (!process)
 	{
 		signal(SIGINT, handle_ctrl_c);
