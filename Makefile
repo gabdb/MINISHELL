@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+         #
+#    By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/04 14:59:57 by eschmitz          #+#    #+#              #
-#    Updated: 2024/12/19 13:25:19 by eschmitz         ###   ########.fr        #
+#    Updated: 2024/12/19 17:12:18 by gnyssens         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -21,7 +21,7 @@ RM		= rm -rf
 # Libraries
 
 MINISHELL_DIR	=	./includes/
-READLINE_DIR	=	$(HOME)/.brew/opt/readline
+READLINE_DIR	=	$(HOME)/local
 READLINE_LIB = -L$(READLINE_DIR)/lib -lreadline -lhistory
 
 # Include directories

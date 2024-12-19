@@ -6,7 +6,7 @@
 /*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 17:59:37 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/18 18:50:43 by gnyssens         ###   ########.fr       */
+/*   Updated: 2024/12/19 17:25:04 by gnyssens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,11 +79,14 @@ void	append_node(char *var, t_env *env, int sign)
 
 void	update_content(t_env *node, char *new_var, int sign)
 {
-	if (node->content && sign != -2)
+	if (node->content && sign != -2 && length_untill_c(new_var, '=') != 0)
+	{
 		free(node->content);
+		node->content = NULL;
+	}
 	if (sign > 0)
 		node->content = safe_strdup(new_var + sign + 1);
-	else if (sign == 0)
+	else if (sign == 0&& length_untill_c(new_var, '=') != 0)
 		node->content = NULL;
 	else if (sign == -2)
 	{
@@ -115,12 +118,13 @@ void	ft_export(t_cmd *node, t_env **env)
 			write(2, "minishell: ", 11);
 			write(2, node->arg[1], ft_strlen(node->arg[1]));
 			my_write(2, ": not a valid identifier\n", 2);
-			break ;
 		}
 		else if (env_var_exists(args[i], *env) == NULL)
 			append_node(args[i], *env, spot_equal_sign);
 		else
+		{
 			update_content(env_var_exists(args[i], *env),
 				args[i], spot_equal_sign);
+		}
 	}
 }
