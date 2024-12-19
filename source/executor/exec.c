@@ -6,7 +6,7 @@
 /*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/28 16:22:50 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/18 14:47:11 by eschmitz         ###   ########.fr       */
+/*   Updated: 2024/12/18 17:40:33 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,7 @@ void	pre_ast(t_ast *node, t_env **env, t_shell *sh)
 		waitpid(pid, &status, 0);
 		if (g_exit_status <= 126)
 			g_exit_status = WEXITSTATUS(status);
+		set_exit_status(status);
 	}
 }
 
@@ -71,6 +72,7 @@ int	is_built_in(t_cmd *node, t_env **env, t_shell *sh)
 
 void	execute_ast(t_ast *node, t_env **env, t_shell *sh)
 {
+	g_exit_status = 0;
 	if (!node)
 		return ;
 	if (node->type == CMD)
@@ -86,6 +88,5 @@ void	execute_ast(t_ast *node, t_env **env, t_shell *sh)
 		handle_input((t_redir *)node, env, sh);
 	else if (node->type == TRUNC || node->type == APPEND)
 		handle_trunc_append((t_redir *)node, env, sh);
-	g_exit_status = 0;
 	exit(g_exit_status);
 }

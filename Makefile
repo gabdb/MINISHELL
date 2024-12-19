@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+         #
+#    By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2024/11/04 14:59:57 by eschmitz          #+#    #+#              #
-#    Updated: 2024/12/18 17:16:47 by gnyssens         ###   ########.fr        #
+#    Updated: 2024/12/19 13:25:19 by eschmitz         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -15,14 +15,13 @@
 
 NAME	= minishell
 CC		= cc
-CFLAGS	= -Wall -Werror -Wextra #-g3 -fsanitize=address
+CFLAGS	= -Wall -Werror -Wextra -g3
 RM		= rm -rf
 
 # Libraries
 
 MINISHELL_DIR	=	./includes/
-#READLINE_DIR	=	$(HOME)/.brew/opt/readline
-READLINE_DIR = $(HOME)/local
+READLINE_DIR	=	$(HOME)/.brew/opt/readline
 READLINE_LIB = -L$(READLINE_DIR)/lib -lreadline -lhistory
 
 # Include directories

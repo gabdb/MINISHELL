@@ -6,7 +6,7 @@
 /*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/05 17:05:37 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/18 14:49:33 by eschmitz         ###   ########.fr       */
+/*   Updated: 2024/12/19 13:05:14 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,8 +17,13 @@ void	handle_input(t_redir *node, t_env **env, t_shell *sh)
 	int	fd;
 
 	fd = open(node->file, O_RDONLY);
-	if (fd < 0 || !node->cmd)
+	if (fd < 0 || !node->file)
+	{
+		my_write(2, "minishell: ", 1);
+		write(2, node->file, ft_strlen(node->file));
+		my_write(2, ": No such file or directory\n", 2);
 		return ;
+	}
 	dup2(fd, STDIN_FILENO);
 	close(fd);
 	if (node->cmd)

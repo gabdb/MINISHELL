@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   b_utils.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
+/*   By: eschmitz <eschmitz@student.s19.be>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/07 16:25:17 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/18 17:14:44 by gnyssens         ###   ########.fr       */
+/*   Updated: 2024/12/19 13:13:04 by eschmitz         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,10 +42,7 @@ void	*safe_malloc(unsigned int size)
 
 	result = malloc(size);
 	if (!result)
-	{
-		write(1, "Malloc failed !, Exiting program\n", 33);
 		exit(EXIT_FAILURE);
-	}
 	return (result);
 }
 
@@ -55,10 +52,7 @@ char	*safe_strdup(char *str)
 
 	result = ft_strdup(str);
 	if (!result)
-	{
-		write(2, "ft_strdup failed !\n", 19);
 		exit(EXIT_FAILURE);
-	}
 	return (result);
 }
 
@@ -81,9 +75,6 @@ char	*safe_strjoin(char *s1, char *s2)
 
 	result = ft_strjoin(s1, s2);
 	if (!result)
-	{
-		write(2, "strjoin fail !, Exiting\n", 24);
 		exit(EXIT_FAILURE);
-	}
 	return (result);
 }
