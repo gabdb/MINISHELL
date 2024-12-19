@@ -6,7 +6,7 @@
 /*   By: gnyssens <gnyssens@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/09 17:59:37 by gnyssens          #+#    #+#             */
-/*   Updated: 2024/12/19 17:25:04 by gnyssens         ###   ########.fr       */
+/*   Updated: 2024/12/19 17:26:21 by gnyssens         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,7 @@ void	update_content(t_env *node, char *new_var, int sign)
 	}
 	if (sign > 0)
 		node->content = safe_strdup(new_var + sign + 1);
-	else if (sign == 0&& length_untill_c(new_var, '=') != 0)
+	else if (sign == 0 && length_untill_c(new_var, '=') != 0)
 		node->content = NULL;
 	else if (sign == -2)
 	{
